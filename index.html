@@ -755,17 +755,8 @@
 
       if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
 
-      // Parse JSON from content
-      let parsed;
-      const raw = (data.content || '').replace(/```json|```/g, '').trim();
-      try {
-        parsed = JSON.parse(raw);
-      } catch {
-        const m = raw.match(/\{[\s\S]*\}/);
-        if (!m) throw new Error('Could not parse AI response. Try again.');
-        parsed = JSON.parse(m[0]);
-      }
-
+      const parsed = data.parsed;
+      if (!parsed || !parsed.summary) throw new Error('No data returned. Check your API keys in Cloudflare.');
       renderResults(parsed, data.modelUsed || model);
 
     } catch (err) {
