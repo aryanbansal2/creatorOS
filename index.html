@@ -1,503 +1,637 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CreatorOS — Know What Works</title>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@400;500&family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
+
 <style>
-:root {
-  --bg: #0c0c0c;
-  --card: #131313;
-  --border: #1f1f1f;
-  --border2: #2a2a2a;
-  --text: #efefef;
-  --muted: #555;
-  --muted2: #888;
-  --green: #b9ff66;
-  --red: #ff6b6b;
-  --yellow: #ffd166;
-  --blue: #66c2ff;
-}
-* { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior: smooth; }
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Geist', sans-serif;
-  font-size: 15px;
-  line-height: 1.6;
-  min-height: 100vh;
-}
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700&family=DM+Sans:wght@400;500&display=swap');
 
-/* Layout */
-.wrap { max-width: 640px; margin: 0 auto; padding: 0 20px; }
+  .co-wrap {
+    font-family: 'DM Sans', sans-serif;
+    padding: 1.5rem 0;
+    color: var(--color-text-primary);
+  }
 
-/* Header */
-header {
-  padding: 48px 0 40px;
-  border-bottom: 1px solid var(--border);
-}
-.tag {
-  display: inline-block;
-  font-family: 'Geist Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--green);
-  background: rgba(185,255,102,0.08);
-  border: 1px solid rgba(185,255,102,0.15);
-  padding: 3px 10px;
-  border-radius: 20px;
-  margin-bottom: 20px;
-}
-h1 {
-  font-family: 'Instrument Serif', serif;
-  font-size: clamp(38px, 7vw, 56px);
-  line-height: 1.05;
-  letter-spacing: -0.02em;
-  font-weight: 400;
-}
-h1 em {
-  font-style: italic;
-  color: var(--green);
-}
-.sub {
-  margin-top: 12px;
-  color: var(--muted2);
-  font-size: 14px;
-  max-width: 400px;
-}
+  .co-logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+    margin-bottom: 2rem;
+  }
 
-/* Upload */
-.upload-wrap { padding: 36px 0 0; }
+  .co-logo span {
+    color: var(--color-text-primary);
+  }
 
-.drop-zone {
-  border: 1.5px dashed var(--border2);
-  border-radius: 14px;
-  padding: 36px 24px;
-  text-align: center;
-  cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
-  background: var(--card);
-  position: relative;
-}
-.drop-zone:hover, .drop-zone.over {
-  border-color: var(--green);
-  background: rgba(185,255,102,0.03);
-}
-.drop-icon { font-size: 32px; margin-bottom: 10px; }
-.drop-zone h3 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
-.drop-zone p { color: var(--muted); font-size: 12px; font-family: 'Geist Mono', monospace; }
-#fileInput { display: none; }
+  .co-upload-zone {
+    border: 0.5px solid var(--color-border-secondary);
+    border-radius: var(--border-radius-lg);
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.15s;
+    background: var(--color-background-primary);
+    position: relative;
+  }
 
-/* Previews */
-.previews {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 12px;
-}
-.prev-item {
-  position: relative;
-  width: 64px;
-  height: 100px;
-  border-radius: 8px;
-  overflow: hidden;
-  background: var(--card);
-  border: 1px solid var(--border2);
-}
-.prev-item img { width:100%; height:100%; object-fit:cover; }
-.prev-item button {
-  position: absolute; top: 3px; right: 3px;
-  background: rgba(0,0,0,0.75); border: none; color: #fff;
-  width: 18px; height: 18px; border-radius: 50%;
-  font-size: 10px; cursor: pointer; display:flex; align-items:center; justify-content:center;
-}
+  .co-upload-zone:hover {
+    background: var(--color-background-secondary);
+  }
 
-/* Analyze btn */
-.btn {
-  width: 100%;
-  margin-top: 16px;
-  padding: 16px;
-  background: var(--green);
-  color: #0c0c0c;
-  border: none;
-  border-radius: 10px;
-  font-family: 'Geist', sans-serif;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.2s, transform 0.15s;
-  position: relative;
-}
-.btn:hover:not(:disabled) { transform: translateY(-1px); opacity: 0.92; }
-.btn:disabled { opacity: 0.3; cursor: not-allowed; }
-.btn.loading { color: transparent; }
-.btn.loading::after {
-  content:''; position:absolute; width:18px; height:18px;
-  border: 2px solid #0c0c0c; border-top-color: transparent;
-  border-radius:50%; top:50%; left:50%;
-  transform:translate(-50%,-50%);
-  animation: spin 0.7s linear infinite;
-}
-@keyframes spin { to { transform: translate(-50%,-50%) rotate(360deg); } }
+  .co-upload-zone.drag-over {
+    border-color: var(--color-border-primary);
+    background: var(--color-background-secondary);
+  }
 
-/* Results */
-#results { padding: 40px 0 60px; display: none; }
-#results.show { display: block; }
+  .co-upload-icon {
+    font-size: 32px;
+    color: var(--color-text-tertiary);
+    margin-bottom: 0.75rem;
+  }
 
-/* Summary card — the big one at top */
-.summary-card {
-  background: var(--card);
-  border: 1px solid var(--border2);
-  border-radius: 14px;
-  padding: 24px;
-  margin-bottom: 12px;
-  animation: up 0.35s ease both;
-}
-.summary-card .s-label {
-  font-family: 'Geist Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--muted2);
-  margin-bottom: 10px;
-}
-.summary-card .s-text {
-  font-family: 'Instrument Serif', serif;
-  font-size: 22px;
-  line-height: 1.3;
-  color: var(--text);
-}
-.summary-card .s-text strong {
-  color: var(--green);
-  font-style: italic;
-}
+  .co-upload-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 0.35rem;
+  }
 
-/* Next title box */
-.next-title-card {
-  background: rgba(185,255,102,0.05);
-  border: 1px solid rgba(185,255,102,0.2);
-  border-radius: 14px;
-  padding: 20px 24px;
-  margin-bottom: 12px;
-  animation: up 0.35s ease 0.1s both;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-.next-title-card .nt-icon { font-size: 28px; flex-shrink: 0; }
-.next-title-card .nt-label {
-  font-family: 'Geist Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--green);
-  margin-bottom: 4px;
-}
-.next-title-card .nt-title {
-  font-size: 17px;
-  font-weight: 600;
-  color: var(--text);
-  line-height: 1.3;
-}
+  .co-upload-sub {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+  }
 
-/* Accordion cards */
-.accordion {
-  border: 1px solid var(--border2);
-  border-radius: 12px;
-  margin-bottom: 8px;
-  overflow: hidden;
-  animation: up 0.35s ease both;
-}
-.acc-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 18px;
-  cursor: pointer;
-  background: var(--card);
-  transition: background 0.15s;
-  user-select: none;
-}
-.acc-header:hover { background: #161616; }
-.acc-dot {
-  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
-}
-.acc-title { flex: 1; font-size: 14px; font-weight: 600; }
-.acc-conf {
-  font-family: 'Geist Mono', monospace;
-  font-size: 11px;
-  color: var(--muted2);
-}
-.acc-arrow {
-  font-size: 12px; color: var(--muted); transition: transform 0.2s;
-}
-.accordion.open .acc-arrow { transform: rotate(180deg); }
+  .co-upload-hint {
+    display: inline-block;
+    margin-top: 1rem;
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+    background: var(--color-background-secondary);
+    border-radius: 4px;
+    padding: 3px 8px;
+    letter-spacing: 0.04em;
+  }
 
-.acc-body {
-  display: none;
-  padding: 0 18px 16px;
-  background: var(--card);
-  border-top: 1px solid var(--border);
-}
-.accordion.open .acc-body { display: block; }
-.acc-body p {
-  font-size: 13px;
-  color: var(--muted2);
-  line-height: 1.7;
-  padding-top: 14px;
-}
-.acc-body .suggest {
-  margin-top: 12px;
-  background: rgba(185,255,102,0.05);
-  border: 1px solid rgba(185,255,102,0.15);
-  border-radius: 8px;
-  padding: 10px 14px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--green);
-}
-.acc-body .suggest span {
-  display: block;
-  font-family: 'Geist Mono', monospace;
-  font-size: 10px;
-  font-weight: 400;
-  color: var(--muted);
-  margin-bottom: 3px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
+  .co-previews {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+  }
 
-@keyframes up {
-  from { opacity:0; transform: translateY(12px); }
-  to { opacity:1; transform: translateY(0); }
-}
+  .co-preview-thumb {
+    width: 64px;
+    height: 64px;
+    border-radius: 6px;
+    object-fit: cover;
+    border: 0.5px solid var(--color-border-tertiary);
+    position: relative;
+  }
 
-/* Error */
-.err {
-  background: rgba(255,107,107,0.07);
-  border: 1px solid rgba(255,107,107,0.2);
-  border-radius: 10px;
-  padding: 16px 18px;
-  font-size: 13px;
-  color: var(--red);
-  font-family: 'Geist Mono', monospace;
-  line-height: 1.6;
-}
+  .co-preview-wrap {
+    position: relative;
+    display: inline-block;
+  }
 
-footer {
-  border-top: 1px solid var(--border);
-  padding: 20px 0;
-  text-align: center;
-  color: var(--muted);
-  font-size: 11px;
-  font-family: 'Geist Mono', monospace;
-}
+  .co-preview-remove {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-secondary);
+    font-size: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-secondary);
+  }
+
+  .co-btn {
+    width: 100%;
+    margin-top: 1.25rem;
+    padding: 12px;
+    background: var(--color-text-primary);
+    color: var(--color-background-primary);
+    border: none;
+    border-radius: var(--border-radius-md);
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .co-btn:hover { opacity: 0.85; }
+  .co-btn:disabled { opacity: 0.4; cursor: default; }
+
+  .co-btn-secondary {
+    background: transparent;
+    color: var(--color-text-secondary);
+    border: 0.5px solid var(--color-border-secondary);
+    margin-top: 0.75rem;
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  .co-loading {
+    text-align: center;
+    padding: 2rem 0;
+    display: none;
+  }
+
+  .co-loading-bar {
+    height: 2px;
+    background: var(--color-border-tertiary);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+
+  .co-loading-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--color-text-primary);
+    border-radius: 2px;
+    animation: fill-bar 8s ease-in-out forwards;
+  }
+
+  @keyframes fill-bar {
+    0% { width: 0% }
+    60% { width: 80% }
+    90% { width: 92% }
+    100% { width: 95% }
+  }
+
+  .co-loading-label {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+  }
+
+  .co-results {
+    display: none;
+  }
+
+  .co-insight-card {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-secondary);
+    border-radius: var(--border-radius-lg);
+    padding: 1.25rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .co-insight-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    margin-bottom: 0.5rem;
+  }
+
+  .co-insight-text {
+    font-family: 'Syne', sans-serif;
+    font-size: 17px;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  .co-next-card {
+    background: var(--color-text-primary);
+    color: var(--color-background-primary);
+    border-radius: var(--border-radius-lg);
+    padding: 1.25rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .co-next-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.5;
+    margin-bottom: 0.5rem;
+  }
+
+  .co-next-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 0.75rem;
+  }
+
+  .co-copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    background: rgba(255,255,255,0.12);
+    border: 0.5px solid rgba(255,255,255,0.2);
+    border-radius: 6px;
+    color: inherit;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .co-copy-btn:hover { background: rgba(255,255,255,0.2); }
+
+  .co-findings {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .co-finding {
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    background: var(--color-background-primary);
+  }
+
+  .co-finding-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .co-finding-header:hover {
+    background: var(--color-background-secondary);
+  }
+
+  .co-finding-badge {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 7px;
+    border-radius: 4px;
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+  }
+
+  .badge-pattern {
+    background: #E6F1FB;
+    color: #0C447C;
+  }
+
+  .badge-warning {
+    background: #FAEEDA;
+    color: #633806;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .badge-pattern { background: #0C447C; color: #B5D4F4; }
+    .badge-warning { background: #633806; color: #FAC775; }
+  }
+
+  .co-finding-title {
+    font-size: 13px;
+    font-weight: 500;
+    flex: 1;
+  }
+
+  .co-finding-conf {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    flex-shrink: 0;
+  }
+
+  .co-finding-chevron {
+    font-size: 14px;
+    color: var(--color-text-tertiary);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+
+  .co-finding.open .co-finding-chevron {
+    transform: rotate(180deg);
+  }
+
+  .co-finding-body {
+    display: none;
+    padding: 0 12px 12px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    border-top: 0.5px solid var(--color-border-tertiary);
+  }
+
+  .co-finding.open .co-finding-body {
+    display: block;
+  }
+
+  .co-finding-body-inner {
+    padding-top: 10px;
+  }
+
+  .co-suggested {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+  }
+
+  .co-suggested strong {
+    color: var(--color-text-primary);
+    font-weight: 500;
+  }
+
+  .co-second-opinion {
+    margin-top: 0.5rem;
+  }
+
+  .co-footer {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 0.5px solid var(--color-border-tertiary);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+  }
+
+  .co-model-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .co-error {
+    font-size: 13px;
+    color: var(--color-text-danger);
+    padding: 12px;
+    border: 0.5px solid var(--color-border-danger);
+    border-radius: var(--border-radius-md);
+    margin-top: 0.75rem;
+    display: none;
+  }
 </style>
-</head>
-<body>
-<div class="wrap">
-  <header>
-    <div class="tag">CreatorOS v0.1</div>
-    <h1>Find out what your<br>audience <em>actually</em> wants.</h1>
-    <p class="sub">Upload YouTube Studio screenshots. Get patterns, warnings, and your next title — in seconds.</p>
-  </header>
 
-  <div class="upload-wrap">
-    <div class="drop-zone" id="dropZone">
-      <div class="drop-icon">📸</div>
-      <h3>Drop YouTube Studio screenshots here</h3>
-      <p>PNG · JPG · multiple files ok</p>
-      <input type="file" id="fileInput" accept="image/*" multiple />
+<div class="co-wrap">
+  <div class="co-logo"><span>Creator</span>OS</div>
+
+  <div id="upload-section">
+    <div class="co-upload-zone" id="drop-zone">
+      <input type="file" id="file-input" multiple accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer;">
+      <div class="co-upload-icon"><i class="ti ti-screenshot" aria-hidden="true"></i></div>
+      <div class="co-upload-title">Drop your YouTube Studio screenshots</div>
+      <div class="co-upload-sub">Content page · Video list · Analytics view<br>No login needed. Screenshots only.</div>
+      <div class="co-upload-hint">PNG · JPG · up to 10 images</div>
+      <div class="co-previews" id="preview-container"></div>
     </div>
-    <div class="previews" id="previews"></div>
-    <button class="btn" id="analyzeBtn" disabled>Analyze my channel →</button>
+
+    <div id="worker-url-section" style="margin-top:0.75rem;">
+      <input type="text" id="worker-url" placeholder="Your Cloudflare Worker URL  (e.g. https://content.abc.workers.dev)" style="width:100%;font-size:13px;padding:10px 12px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);box-sizing:border-box;">
+    </div>
+
+    <button class="co-btn" id="analyze-btn" disabled>Analyze my channel</button>
+    <div class="co-error" id="error-box"></div>
   </div>
 
-  <div id="results">
-    <div id="resultsInner"></div>
+  <div class="co-loading" id="loading-section">
+    <div class="co-loading-bar"><div class="co-loading-fill"></div></div>
+    <div class="co-loading-label" id="loading-label">Reading your screenshots...</div>
   </div>
 
-  <footer>creatorOS · your data never leaves your browser</footer>
+  <div class="co-results" id="results-section">
+    <div class="co-insight-card">
+      <div class="co-insight-label">Biggest insight</div>
+      <div class="co-insight-text" id="result-summary">—</div>
+    </div>
+
+    <div class="co-next-card">
+      <div class="co-next-label">Post this next</div>
+      <div class="co-next-title" id="result-next-title">—</div>
+      <button class="co-copy-btn" id="copy-btn">
+        <i class="ti ti-copy" style="font-size:13px;" aria-hidden="true"></i> Copy title
+      </button>
+    </div>
+
+    <div class="co-findings" id="findings-container"></div>
+
+    <div class="co-second-opinion">
+      <button class="co-btn co-btn-secondary" id="second-opinion-btn">
+        <i class="ti ti-brain" style="font-size:14px;vertical-align:-2px;margin-right:5px;" aria-hidden="true"></i>
+        Get second opinion with Gemini
+      </button>
+    </div>
+
+    <div class="co-footer">
+      <span class="co-model-tag">
+        <i class="ti ti-cpu" style="font-size:12px;" aria-hidden="true"></i>
+        <span id="model-label">Llama 3.2 90B Vision · NVIDIA NIM</span>
+      </span>
+      <button onclick="resetApp()" style="background:none;border:none;font-size:11px;color:var(--color-text-tertiary);cursor:pointer;padding:0;">
+        Analyze another channel →
+      </button>
+    </div>
+  </div>
 </div>
 
 <script>
-const WORKER = 'https://content.ab2893935.workers.dev/';
-const drop = document.getElementById('dropZone');
-const fileInput = document.getElementById('fileInput');
-const previews = document.getElementById('previews');
-const btn = document.getElementById('analyzeBtn');
-const results = document.getElementById('results');
-const inner = document.getElementById('resultsInner');
-let files = [];
+  const fileInput = document.getElementById('file-input');
+  const dropZone = document.getElementById('drop-zone');
+  const previewContainer = document.getElementById('preview-container');
+  const analyzeBtn = document.getElementById('analyze-btn');
+  const workerUrlInput = document.getElementById('worker-url');
+  const errorBox = document.getElementById('error-box');
 
-drop.addEventListener('click', () => fileInput.click());
-drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
-drop.addEventListener('dragleave', () => drop.classList.remove('over'));
-drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); add(Array.from(e.dataTransfer.files)); });
-fileInput.addEventListener('change', e => add(Array.from(e.target.files)));
+  let uploadedFiles = [];
 
-function add(newFiles) {
-  newFiles.filter(f => f.type.startsWith('image/')).forEach(f => {
-    files.push(f);
-    const r = new FileReader();
-    r.onload = e => {
-      const idx = files.length - 1;
-      const d = document.createElement('div');
-      d.className = 'prev-item';
-      d.innerHTML = `<img src="${e.target.result}"><button onclick="remove(${idx})">×</button>`;
-      previews.appendChild(d);
-    };
-    r.readAsDataURL(f);
-  });
-  sync();
-}
+  const loadingMessages = [
+    'Reading your screenshots...',
+    'Extracting titles and views...',
+    'Finding patterns in your data...',
+    'Building your report...'
+  ];
 
-function remove(i) {
-  files.splice(i, 1);
-  previews.innerHTML = '';
-  const tmp = [...files]; files = [];
-  add(tmp);
-}
+  function showError(msg) {
+    errorBox.textContent = msg;
+    errorBox.style.display = 'block';
+  }
 
-function sync() { btn.disabled = files.length === 0; }
+  function hideError() {
+    errorBox.style.display = 'none';
+  }
 
-async function toB64(f) {
-  return new Promise((res, rej) => {
-    const r = new FileReader();
-    r.onload = () => res(r.result.split(',')[1]);
-    r.onerror = rej;
-    r.readAsDataURL(f);
-  });
-}
+  function updateAnalyzeBtn() {
+    analyzeBtn.disabled = uploadedFiles.length === 0 || !workerUrlInput.value.trim();
+  }
 
-btn.addEventListener('click', async () => {
-  if (!files.length) return;
-  btn.classList.add('loading'); btn.disabled = true;
-  results.classList.remove('show'); inner.innerHTML = '';
+  workerUrlInput.addEventListener('input', updateAnalyzeBtn);
 
-  try {
-    const parts = await Promise.all(files.map(async f => ({
-      inlineData: { mimeType: f.type, data: await toB64(f) }
-    })));
-
-    const prompt = `You are a sharp YouTube Shorts analyst. A creator uploaded their YouTube Studio screenshots.
-
-Your job: find what's actually working and give them ONE clear action.
-
-Extract all video titles and view counts from the screenshots.
-
-Then respond ONLY with a JSON object (no markdown, no explanation) in this exact shape:
-
-{
-  "summary": "One punchy sentence (max 20 words) summarizing the single biggest insight from their data. Be specific with numbers.",
-  "next_title": "The single best title they should post next, based on their top pattern.",
-  "findings": [
-    {
-      "type": "pattern",
-      "title": "Short name (4 words max)",
-      "body": "2-3 sentences max. Specific video names and view counts. Why this pattern works.",
-      "confidence": 90,
-      "suggested_title": "Optional: a specific title to test"
-    },
-    {
-      "type": "warning",
-      "title": "Short name (4 words max)",
-      "body": "2-3 sentences max. What's hurting performance and why.",
-      "confidence": 80
+  function addFiles(files) {
+    for (const f of files) {
+      if (!f.type.startsWith('image/')) continue;
+      if (uploadedFiles.length >= 10) break;
+      uploadedFiles.push(f);
+      const wrap = document.createElement('div');
+      wrap.className = 'co-preview-wrap';
+      const img = document.createElement('img');
+      img.className = 'co-preview-thumb';
+      img.src = URL.createObjectURL(f);
+      const rm = document.createElement('button');
+      rm.className = 'co-preview-remove';
+      rm.innerHTML = '<i class="ti ti-x" style="font-size:9px;"></i>';
+      const idx = uploadedFiles.length - 1;
+      rm.onclick = (e) => {
+        e.stopPropagation();
+        uploadedFiles.splice(idx, 1);
+        wrap.remove();
+        updateAnalyzeBtn();
+      };
+      wrap.appendChild(img);
+      wrap.appendChild(rm);
+      previewContainer.appendChild(wrap);
     }
-  ]
-}
+    updateAnalyzeBtn();
+  }
 
-Rules:
-- summary must mention actual numbers from their data
-- next_title must be specific and ready to use, not generic
-- findings: max 4 items total, mix of patterns and warnings
-- body: SHORT. 2-3 sentences only. No fluff.
-- Only conclusions the data supports. No generic YouTube advice.`;
+  fileInput.addEventListener('change', () => addFiles(fileInput.files));
 
-    const res = await fetch(WORKER, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }, ...parts] }],
-        generationConfig: { temperature: 0.2 }
-      })
+  dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    addFiles(e.dataTransfer.files);
+  });
+
+  function fileToBase64(file) {
+    return new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => res({ data: r.result.split(',')[1], mimeType: file.type });
+      r.onerror = rej;
+      r.readAsDataURL(file);
+    });
+  }
+
+  async function runAnalysis(model) {
+    hideError();
+    document.getElementById('upload-section').style.display = 'none';
+    const loadingEl = document.getElementById('loading-section');
+    loadingEl.style.display = 'block';
+    document.getElementById('results-section').style.display = 'none';
+
+    let labelIdx = 0;
+    const labelInterval = setInterval(() => {
+      labelIdx = (labelIdx + 1) % loadingMessages.length;
+      document.getElementById('loading-label').textContent = loadingMessages[labelIdx];
+    }, 2200);
+
+    try {
+      const images = await Promise.all(uploadedFiles.map(fileToBase64));
+      const workerUrl = workerUrlInput.value.trim();
+
+      const resp = await fetch(workerUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ images, model: model || 'nvidia' })
+      });
+
+      const data = await resp.json();
+      clearInterval(labelInterval);
+
+      if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+
+      let content = data.content || '';
+
+      let parsed;
+      try {
+        const cleaned = content.replace(/```json|```/g, '').trim();
+        parsed = JSON.parse(cleaned);
+      } catch {
+        const match = content.match(/\{[\s\S]*\}/);
+        if (match) parsed = JSON.parse(match[0]);
+        else throw new Error('Could not parse AI response. Try again.');
+      }
+
+      renderResults(parsed, data.modelUsed || model || 'nvidia');
+
+    } catch (err) {
+      clearInterval(labelInterval);
+      loadingEl.style.display = 'none';
+      document.getElementById('upload-section').style.display = 'block';
+      showError('Analysis failed: ' + (err.message || 'Unknown error. Check your Worker URL and API keys.'));
+    }
+  }
+
+  function renderResults(data, modelUsed) {
+    document.getElementById('loading-section').style.display = 'none';
+    const resultsEl = document.getElementById('results-section');
+    resultsEl.style.display = 'block';
+
+    document.getElementById('result-summary').textContent = data.summary || '—';
+    document.getElementById('result-next-title').textContent = data.next_title || '—';
+
+    document.getElementById('model-label').textContent =
+      modelUsed === 'gemini' ? 'Gemini 2.5 Flash · Google' : 'Llama 3.2 90B Vision · NVIDIA NIM';
+
+    document.getElementById('copy-btn').onclick = () => {
+      navigator.clipboard.writeText(data.next_title || '');
+      document.getElementById('copy-btn').innerHTML = '<i class="ti ti-check" style="font-size:13px;"></i> Copied';
+      setTimeout(() => {
+        document.getElementById('copy-btn').innerHTML = '<i class="ti ti-copy" style="font-size:13px;"></i> Copy title';
+      }, 1800);
+    };
+
+    const container = document.getElementById('findings-container');
+    container.innerHTML = '';
+
+    (data.findings || []).forEach((f) => {
+      const div = document.createElement('div');
+      div.className = 'co-finding';
+
+      const header = document.createElement('div');
+      header.className = 'co-finding-header';
+      header.innerHTML = `
+        <span class="co-finding-badge ${f.type === 'warning' ? 'badge-warning' : 'badge-pattern'}">
+          ${f.type === 'warning' ? 'Warning' : 'Pattern'}
+        </span>
+        <span class="co-finding-title">${f.title || ''}</span>
+        <span class="co-finding-conf">${f.confidence ? f.confidence + '%' : ''}</span>
+        <i class="ti ti-chevron-down co-finding-chevron" aria-hidden="true"></i>
+      `;
+
+      const body = document.createElement('div');
+      body.className = 'co-finding-body';
+      body.innerHTML = `
+        <div class="co-finding-body-inner">
+          ${f.body || ''}
+          ${f.suggested_title ? `<div class="co-suggested">Try: <strong>${f.suggested_title}</strong></div>` : ''}
+        </div>
+      `;
+
+      header.onclick = () => div.classList.toggle('open');
+      div.appendChild(header);
+      div.appendChild(body);
+      container.appendChild(div);
     });
 
-    const data = await res.json();
-    if (data.error) throw new Error(data.error.message);
-    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    render(raw);
-  } catch(e) {
-    inner.innerHTML = `<div class="err">⚠ ${e.message}</div>`;
-    results.classList.add('show');
+    document.getElementById('second-opinion-btn').onclick = () => {
+      document.getElementById('second-opinion-btn').disabled = true;
+      document.getElementById('second-opinion-btn').textContent = 'Getting second opinion...';
+      runAnalysis('gemini');
+    };
   }
 
-  btn.classList.remove('loading'); btn.disabled = false;
-  results.scrollIntoView({ behavior: 'smooth', block: 'start' });
-});
+  analyzeBtn.onclick = () => runAnalysis('nvidia');
 
-function render(raw) {
-  results.classList.add('show');
-  try {
-    const clean = raw.replace(/```json|```/g, '').trim();
-    const d = JSON.parse(clean);
-    let html = '';
-
-    // Summary
-    if (d.summary) {
-      const bold = d.summary.replace(/(\d[\d,.KkMm]*x?)/g, '<strong>$1</strong>');
-      html += `<div class="summary-card">
-        <div class="s-label">📊 Channel Insight</div>
-        <div class="s-text">${bold}</div>
-      </div>`;
-    }
-
-    // Next title
-    if (d.next_title) {
-      html += `<div class="next-title-card">
-        <div class="nt-icon">🎯</div>
-        <div>
-          <div class="nt-label">Post This Next</div>
-          <div class="nt-title">${d.next_title}</div>
-        </div>
-      </div>`;
-    }
-
-    // Findings as accordion
-    if (d.findings?.length) {
-      d.findings.forEach((f, i) => {
-        const color = f.type === 'warning' ? 'var(--red)' : f.type === 'pattern' ? 'var(--green)' : 'var(--yellow)';
-        const icon = f.type === 'warning' ? '⚠' : f.type === 'pattern' ? '🔍' : '💡';
-        const conf = f.confidence ? `${f.confidence}%` : '';
-        html += `<div class="accordion" style="animation-delay:${0.15 + i*0.07}s">
-          <div class="acc-header" onclick="toggle(this)">
-            <div class="acc-dot" style="background:${color}"></div>
-            <div class="acc-title">${icon} ${f.title}</div>
-            ${conf ? `<div class="acc-conf">${conf}</div>` : ''}
-            <div class="acc-arrow">▼</div>
-          </div>
-          <div class="acc-body">
-            <p>${f.body}</p>
-            ${f.suggested_title ? `<div class="suggest"><span>Try this title</span>${f.suggested_title}</div>` : ''}
-          </div>
-        </div>`;
-      });
-    }
-
-    inner.innerHTML = html;
-  } catch {
-    inner.innerHTML = `<div class="err" style="white-space:pre-wrap;font-size:12px">${raw}</div>`;
+  function resetApp() {
+    uploadedFiles = [];
+    previewContainer.innerHTML = '';
+    document.getElementById('results-section').style.display = 'none';
+    document.getElementById('upload-section').style.display = 'block';
+    document.getElementById('loading-section').style.display = 'none';
+    hideError();
+    updateAnalyzeBtn();
   }
-}
-
-function toggle(header) {
-  const acc = header.closest('.accordion');
-  acc.classList.toggle('open');
-}
 </script>
-</body>
-</html>
